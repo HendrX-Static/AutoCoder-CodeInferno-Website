@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>黒山の呪い: The Curse of Kuroyama Forest</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Zen+Antique&family=Noto+Serif+JP:wght@400;700&display=swap');
+
+:root {
+    --blood: #8B0000;
+    --shadow: #1a0000;
+    --text: #ffffff;
+    --bg: #000000;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+            margin: 0;
+            background-color: transparent;
+            color: var(--text);
+            font-family: 'Noto Serif JP', serif;
+            overflow-x: hidden;
+            position: relative;
+        }
+        html, body {
+            min-height: 100%;
+            margin: 0;
+            background-color: transparent;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('bgg.gif') no-repeat center center fixed;
+            background-size: cover;
+            opacity: 0;
+            filter: brightness(0.3) contrast(1.2);
+            z-index: -1;
+            animation: backgroundPulse 8s ease-in-out infinite;
+        }
+
+        @keyframes backgroundPulse {
+            0%, 100% { filter: brightness(0.3) contrast(1.2); }
+            50% { filter: brightness(0.2) contrast(1.3); }
+        }
+
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: url('bgg.gif') no-repeat center center fixed;
+            background-size: cover;
+            opacity: 1;
+        }
+        .jumpscare-container {
+    position: relative;
+    height: 50vh;
+    margin: 2rem 0;
+    overflow: hidden;
+}
+
+.jumpscare-image {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+    width: 300px;
+    height: 300px;
+    transition: all 2s ease;
+    opacity: 0;
+    filter: blur(3px) brightness(0.3);
+    -webkit-mask-image: radial-gradient(circle at center, black 50%, transparent 80%);
+    mask-image: radial-gradient(circle at center, black 50%, transparent 80%);
+}
+
+.jumpscare-image.visible {
+    transform: translate(-50%, -50%) scale(1.1);
+    filter: blur(0) brightness(1);
+    opacity: 1;
+}
+
+        .jumpscare-container.visible .jumpscare-image {
+    transform: translate(-50%, -50%) scale(1.1);
+    filter: blur(0) brightness(1);
+}
+
+
+        @keyframes shake {
+            0%, 100% { transform: translate(-50%, -50%) scale(1.2); }
+            10%, 30%, 50%, 70%, 90% { transform: translate(-52%, -48%) scale(1.3) rotate(-2deg); }
+            20%, 40%, 60%, 80% { transform: translate(-48%, -52%) scale(1.3) rotate(2deg); }
+        }
+
+        .landing {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            flex-direction: column;
+        }
+
+        .start-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: black;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    transition: opacity 2s ease;
+}
+
+.start-button {
+    background: none;
+    border: 1px solid var(--blood);
+    color: var(--blood);
+    padding: 15px 30px;
+    font-family: 'Zen Antique', serif;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 2rem;
+    opacity: 0;
+    animation: fadeIn 2s ease 1s forwards;
+}
+
+.start-button:hover {
+    background-color: var(--blood);
+    color: black;
+    transform: scale(1.1);
+}
+
+.start-title {
+    color: var(--blood);
+    font-family: 'Zen Antique', serif;
+    font-size: 3rem;
+    text-align: center;
+    opacity: 0;
+    animation: fadeIn 2s ease forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+        .title {
+            font-family: 'Zen Antique', serif;
+            font-size: 4rem;
+            text-shadow: 0 0 10px var(--blood);
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 2s ease;
+            text-align: center;
+        }
+
+        .content-wrapper {
+            position: relative;
+            min-height: 100vh;
+            z-index: 1;
+        }
+
+        .subtitle {
+            font-family: 'Zen Antique', serif;
+            font-size: 1.5rem;
+            margin-top: 1rem;
+            text-shadow: 0 0 10px var(--blood);
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 2s ease;
+            transition-delay: 0.5s;
+        }
+
+        .title.visible, .subtitle.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .story-container {
+            position: relative;
+            z-index: 1;
+            backdrop-filter: blur(3px);
+        }
+
+        .chapter {
+            margin: 4rem 0;
+            padding: 2rem;
+            border: 1px solid var(--blood);
+            position: relative;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s ease;
+        }
+
+        .chapter.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .chapter::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            border: 1px solid var(--blood);
+            z-index: -1;
+            animation: pulse 4s infinite;
+        }
+
+        .handprint {
+            position: fixed;
+            width: 100px;
+            height: 100px;
+            background: var(--blood);
+            opacity: 0;
+            filter: blur(2px);
+            transition: opacity 0.5s;
+            pointer-events: none;
+            z-index: 100;
+            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M60,15 C55,10 50,20 50,25 L50,60 L55,60 L55,25 C55,22 58,18 60,22 L60,60 L65,60 L65,30 C65,25 70,25 70,30 L70,60 L75,60 L75,35 C75,30 80,30 80,35 L80,60 L85,60 L85,45 C85,40 90,40 90,45 L90,70 C90,75 80,85 70,85 L40,85 C30,85 25,80 20,70 C15,60 0,40 25,40 L25,35 C-5,35 5,70 15,80 C25,90 35,90 45,90 L65,90 C80,90 95,75 95,65 L95,45 C95,35 85,35 85,40 L85,40 L85,35 C85,25 75,25 75,30 L75,30 L75,25 C75,15 65,15 65,25 L65,25 L65,20 C65,15 60,10 60,15 Z'/%3E%3C/svg%3E");
+            -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M60,15 C55,10 50,20 50,25 L50,60 L55,60 L55,25 C55,22 58,18 60,22 L60,60 L65,60 L65,30 C65,25 70,25 70,30 L70,60 L75,60 L75,35 C75,30 80,30 80,35 L80,60 L85,60 L85,45 C85,40 90,40 90,45 L90,70 C90,75 80,85 70,85 L40,85 C30,85 25,80 20,70 C15,60 0,40 25,40 L25,35 C-5,35 5,70 15,80 C25,90 35,90 45,90 L65,90 C80,90 95,75 95,65 L95,45 C95,35 85,35 85,40 L85,40 L85,35 C85,25 75,25 75,30 L75,30 L75,25 C75,15 65,15 65,25 L65,25 L65,20 C65,15 60,10 60,15 Z'/%3E%3C/svg%3E");
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background-color: rgba(0, 0, 0, 0.85);
+            opacity: 0.7;
+        }
+
+        .ghost {
+            position: fixed;
+            width: 80px;
+            height: 120px;
+            background: url('/api/placeholder/80/120') no-repeat;
+            opacity: 0;
+            transition: all 0.3s;
+            pointer-events: none;
+            z-index: 99;
+            filter: blur(1px) grayscale(1);
+        }
+
+        .glitch-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+            mix-blend-mode: difference;
+        }
+
+        .glitch-line {
+            position: fixed;
+            width: 100%;
+            height: 1px;
+            background: rgba(139,0,0,0.5);
+            animation: glitch-line 3s infinite;
+        }
+
+        .text-glitch {
+            animation: text-glitch 0.3s infinite;
+            position: relative;
+        }
+
+        .noise {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyBAMAAADsEZWCAAAAGFBMVEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAE6h7QAAAAB3RSTlMAGwQIFQkKCwvczEabAAAAhElEQVQ4y2NgGAWjYBSMgmENGAUYkAQLnBMY4QxHoQQ1uEAgwQYu5ShUAFIKchGcalAqgYERbh9CASSEnJQC9wVBKqF8uBCaxUiuRLYS3RfIOQDdLRgW4wSD1COJIbsd7mqwg+G+RwkRpLDEEmn4IxUnmOKMC5zxhT8xcCYa/oQdBaNgZAMAenFRj4zB8PAAAAAASUVORK5CYII=');
+            opacity: 0.02;
+            z-index: 9999;
+            pointer-events: none;
+            animation: noise 0.2s infinite;
+        }
+
+        @keyframes glitch-line {
+            0% { top: -100%; }
+            100% { top: 100%; }
+        }
+
+        @keyframes text-glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
+        }
+
+        @keyframes noise {
+            0% { transform: translate(0,0) }
+            10% { transform: translate(-5%,-5%) }
+            20% { transform: translate(-10%,5%) }
+            30% { transform: translate(5%,-10%) }
+            40% { transform: translate(-5%,15%) }
+            50% { transform: translate(-10%,5%) }
+            60% { transform: translate(15%,0) }
+            70% { transform: translate(0,10%) }
+            80% { transform: translate(-15%,0) }
+            90% { transform: translate(10%,5%) }
+            100% { transform: translate(5%,0) }
+        }
+
+        .rgb-shift {
+            text-shadow: 
+                -2px 0 var(--blood),
+                2px 0 cyan;
+            animation: rgb-animation 2s infinite;
+        }
+
+        @keyframes rgb-animation {
+            0% { text-shadow: -2px 0 var(--blood), 2px 0 cyan; }
+            25% { text-shadow: -4px 0 var(--blood), 4px 0 cyan; }
+            50% { text-shadow: -2px 0 var(--blood), 2px 0 cyan; }
+            75% { text-shadow: -4px 0 var(--blood), 4px 0 cyan; }
+            100% { text-shadow: -2px 0 var(--blood), 2px 0 cyan; }
+        }
+
+        .auto-scroll {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            border: 1px solid var(--blood);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sound-control {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 10000; /* Increased z-index to appear above start screen */
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            border: 1px solid var(--blood);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sound-control label {
+            color: var(--blood);
+            font-family: 'Zen Antique', serif;
+            cursor: pointer;
+        }
+
+        .sound-control input {
+            cursor: pointer;
+        }
+
+        .background-music {
+            display: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+        }
+
+        @keyframes glitch {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-2px); }
+            50% { transform: translateX(2px); }
+            75% { transform: translateX(-2px); }
+            100% { transform: translateX(0); }
+        }
+
+        .scroll-warning {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--blood);
+            font-family: 'Zen Antique', serif;
+            opacity: 0.7;
+            text-align: center;
+        }
+
+        p {
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            margin-bottom: 1.5rem;
+            font-family: 'Zen Antique', serif;
+        }
+
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2.5rem;
+            }
+
+            .subtitle {
+                font-size: 1.2rem;
+            }
+
+            .chapter {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="glitch-overlay"></div>
+    <div class="noise"></div>
+    <div class="glitch-overlay"></div>
+    <div class="glitch-line"></div>
+    <div class="background"></div>
+    <div class="overlay"></div>
+    <div class="content-wrapper">
+
+        <div class="start-screen">
+            <h1 class="start-title">黒山の呪い<br>The Curse of Kuroyama Forest</h1>
+            <button class="start-button">Enter If You Dare</button>
+        </div>
+
+    <div class="landing">
+        <h1 class="title rgb-shift">黒山の呪い</h1>
+        <h2 class="subtitle rgb-shift">The Curse of Kuroyama Forest</h2>
+    </div>
+
+    <div class="story-container">
+        <div class="chapter">
+            <h2 class="rgb-shift">序章: The Beginning</h2>
+            <p>In a remote corner of Japan, nestled between towering mountains, there lay a dense, dark forest known as Kuroyama, or "Black Mountain." The locals, who lived in nearby villages, avoided the forest at all costs. The trees were so thick that sunlight barely touched the ground, and the shadows within were said to be alive, shifting with a presence unseen.</p>
+            <p>Many years ago, the villagers had lived in harmony with the forest, collecting firewood and hunting its game. However, over time, strange disappearances began to occur. Livestock would vanish without a trace, and even children playing near the edges of the forest would never return. The villagers began to whisper of a curse that haunted the depths of Kuroyama.</p>
+        </div>
+        <div class="jumpscare-container">
+            <img src="1.jpg" alt="Yuki's Face" class="jumpscare-image">
+        </div>
+
+        <div class="chapter">
+            <h2 class="rgb-shift">血塗られた記憶: Bloody Memories</h2>
+            <p>The legend of the spirit was tied to a terrible tragedy from centuries ago. A powerful samurai named Kiyomori had once wandered into Kuroyama to seek refuge from his enemies. He stumbled upon a secluded shrine, where he encountered a beautiful woman named Yuki, who was said to be the guardian spirit of the forest.</p>
+            <p>Yuki, with her pale face and flowing black hair, warned Kiyomori that the forest was not a place for humans and that he would be cursed if he chose to stay. But the samurai, driven by his pride and desperation, ignored her warning. In a fit of rage, Kiyomori attacked Yuki, and in the struggle, he struck her down.</p>
+            <p>As she died, she cursed him and vowed to never leave the forest. She called upon the power of Kuroyama, and with her final breath, she sealed Kiyomori's fate—his soul would be bound to the forest for all eternity.</p>
+        </div>
+        <div class="jumpscare-container">
+            <img src="2.jpg" alt="Bloody Handprint" class="jumpscare-image">
+        </div>
+
+        <div class="chapter text-glitch">
+            <h2 class="rgb-shift">永遠の責め苦: Eternal Torment</h2>
+            <p>Ever since that day, the spirit of Yuki had haunted Kuroyama. It was said that she could take the form of a woman, a wraith, or a shadow, and she would lead travelers deep into the forest, where they would become lost, never to return. The villagers knew that if anyone ventured too far into Kuroyama, the spirit would claim them as her own.</p>
+            <p>One autumn evening, a young man named Hiroshi, seeking adventure and eager to prove himself, ignored the warnings of the villagers. He had heard the stories but did not believe in them. Driven by curiosity and the desire to uncover the truth, he set off for the forest, determined to find the source of the mysterious disappearances.</p>
+        </div>
+        <div class="jumpscare-container">
+            <img src="3.jpg" alt="Bloody Handprint" class="jumpscare-image">
+        </div>
+
+        <div class="chapter">
+            <h2 class="rgb-shift">闇への誘い: Invitation to Darkness</h2>
+            <p>As he entered the forest, the air grew unnaturally cold. The trees, gnarled and twisted, seemed to reach out toward him with their skeletal branches. The deeper he went, the quieter it became. No birds, no rustling leaves—only the sound of his own breath. Despite his growing unease, Hiroshi pressed on.</p>
+            <p>Hours passed, and the sky began to darken. The light that filtered through the canopy of trees faded, leaving him surrounded by an impenetrable blackness. Then, he heard it—a soft, melodic voice, like a whisper carried on the wind. The voice called his name, gentle and inviting.</p>
+            <p>"Hiroshi... Come to me..."</p>
+        </div>
+        <div class="jumpscare-container">
+            <img src="4.jpg" alt="Bloody Handprint" class="jumpscare-image">
+        </div>
+
+        <div class="chapter">
+            <h2 class="rgb-shift">幽霊の囁き: Ghostly Whispers</h2>
+            <p>He turned, but there was no one there. Just the deep shadows of the trees. Shaking off his fear, he continued walking. But the voice followed him, growing clearer and more insistent.</p>
+            <p>"Hiroshi… Come closer…"</p>
+            <p>Suddenly, he saw her—a figure standing beneath a cluster of twisted trees. A woman, pale and beautiful, with long black hair flowing like ink. Her face was serene, but her eyes, though gentle, held an ancient sorrow.</p>
+            <p>"Who are you?" Hiroshi asked, his voice trembling.</p>
+            <p>"I am Yuki," the woman replied softly. "I've been waiting for you."</p>
+        </div>
+        <div class="jumpscare-container">
+            <img src="5.jpg" alt="Bloody Handprint" class="jumpscare-image">
+        </div>
+
+        <div class="chapter">
+            <h2 class="rgb-shift">魂の捕獲: Soul Capture</h2>
+            <p>Hiroshi's heart pounded. This was the spirit the villagers spoke of. He knew he should turn back, but something about her voice held him captive. She seemed so real, so human.</p>
+            <p>Yuki stepped closer, her form gliding over the ground like mist. She reached out a delicate hand, her fingers cold as ice. Hiroshi, entranced, reached for her, but as his hand brushed hers, he felt a sharp, searing pain shoot through his chest.</p>
+            <p>Suddenly, the world around him began to shift. The trees seemed to bend, their trunks twisting into grotesque shapes. The sky above darkened, and the ground beneath him became soft and treacherous. Hiroshi tried to pull away, but the forest seemed to close in around him, the shadows stretching like arms, grabbing at his legs.</p>
+        </div>
+        <div class="jumpscare-container">
+            <img src="6.jpg" alt="Bloody Handprint" class="jumpscare-image">
+        </div>
+
+        <div class="chapter text-glitch">
+            <h2 class="rgb-shift">終わりのない悪夢: Endless Nightmare</h2>
+            <p>"No…" he whispered, his breath coming in shallow gasps. "No, I didn't mean to—"</p>
+            <p>"You cannot escape," Yuki's voice whispered in his ear, her cold breath chilling him to the bone. "You've come too far. You will be with me, forever."</p>
+            <p>Hiroshi tried to run, but the ground seemed to shift under his feet, and the forest grew impossibly large. The trees whispered his name, and the shadows reached for him, pulling him deeper into their grasp. The sound of his heartbeat was deafening, but he could no longer see the way out. Every step he took, the forest seemed to grow darker.</p>
+            <p>As the night stretched on, Hiroshi's screams echoed through the blackness of Kuroyama. His body, though alive, was not his own anymore. He became part of the forest, his soul bound to the spirit of Yuki. His eyes, now hollow, reflected the ancient sorrow of the curse that had claimed him. And so, like many before him, Hiroshi was lost to the forest, his body a mere echo of the man he once was.</p>
+        </div>
+        <div class="jumpscare-container">
+            <img src="7.jpg" alt="Bloody Handprint" class="jumpscare-image">
+        </div>
+
+        <div class="chapter">
+            <h2 class="rgb-shift">森の囁き: Whispers of the Forest</h2>
+            <p>Years later, the villagers still whispered of the dark forest and the spirits that roamed its depths. It was said that if you ventured too close to the edge of Kuroyama, you could hear the faint, mournful cries of those who had been taken. And sometimes, in the stillness of the night, when the wind howled through the trees, you could hear the voice of Yuki, calling out to the lost souls of the forest.</p>
+            <p>"Come to me…"</p>
+            <p>And the forest, with its eternal darkness, would claim yet another soul.</p>
+            <p>Even now, as you read these words, can you hear her voice? Can you feel the cold fingers of the forest reaching out through the screen? Some say that just by knowing the story of Kuroyama, you open a door in your mind, a door that Yuki can slip through...</p>
+        </div>
+    </div>
+
+    <div class="scroll-warning">Continue scrolling... if you dare</div>
+    <div class="handprint"></div>
+    <div class="ghost"></div>
+
+    <audio id="backgroundMusic" class="background-music" loop>
+        <source src="bg_audio.mp3" type="audio/mp3">
+    </audio>
+    
+    <div class="auto-scroll">
+        <input type="checkbox" id="autoScroll">
+        <label for="autoScroll">Cursed Scroll</label>
+    </div>
+
+    <div class="sound-control">
+        <input type="checkbox" id="soundToggle">
+        <label for="soundToggle">Enable Music</label>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const title = document.querySelector('.title');
+            const subtitle = document.querySelector('.subtitle');
+            const chapters = document.querySelectorAll('.chapter');
+            const handprint = document.querySelector('.handprint');
+            const ghost = document.querySelector('.ghost');
+            const backgroundMusic = document.getElementById('backgroundMusic');
+            const soundToggle = document.getElementById('soundToggle');
+            const jumpscareContainers = document.querySelectorAll('.jumpscare-container');
+            const jumpscareImages = document.querySelectorAll('.jumpscare-image');
+            const startScreen = document.querySelector('.start-screen');
+            const startButton = document.querySelector('.start-button');
+
+            let lastGhostAppearance = 0;
+            let autoScrollInterval;
+            const savedSoundPreference = localStorage.getItem('soundEnabled');
+            let soundEnabled = savedSoundPreference === 'true';
+            soundToggle.checked = soundEnabled;
+            setTimeout(() => title.classList.add('visible'), 1000);
+            setTimeout(() => subtitle.classList.add('visible'), 1500);
+
+            function isInViewport(element) {
+            const rect = element.getBoundingClientRect();
+            const threshold = 0.4; // Show image when 40% in view
+            return (
+                rect.top >= -rect.height * (1 - threshold) &&
+                rect.top <= window.innerHeight * (1 - threshold)
+            );
+        }if (soundEnabled) {
+                // Create a function to attempt playing music
+                const attemptPlayMusic = () => {
+                    const playPromise = backgroundMusic.play();
+                    if (playPromise !== undefined) {
+                        playPromise.catch(error => {
+                            // Auto-play was prevented, we'll wait for user interaction
+                            console.log("Autoplay prevented, waiting for user interaction");
+                        });
+                    }
+                };
+
+                // Try to play music initially
+                attemptPlayMusic();
+            }
+
+            startButton.addEventListener('click', () => {
+                startScreen.style.opacity = '0';
+                setTimeout(() => {
+                    startScreen.style.display = 'none';
+                }, 2000);
+                
+                // If sound is enabled, try to play music on start button click
+                if (soundEnabled) {
+                    backgroundMusic.play();
+                }
+            });
+
+            soundToggle.addEventListener('change', function() {
+                soundEnabled = this.checked;
+                localStorage.setItem('soundEnabled', soundEnabled);
+                
+                if (soundEnabled) {
+                    backgroundMusic.play();
+                } else {
+                    backgroundMusic.pause();
+                }
+            });
+
+        function checkJumpscares() {
+            jumpscareImages.forEach(image => {
+                if (isInViewport(image.parentElement)) {
+                    image.classList.add('visible');
+                } else {
+                    image.classList.remove('visible');
+                }
+            });
+        }
+
+            function checkVisibility() {
+                chapters.forEach(chapter => {
+                    if (isInViewport(chapter)) {
+                        chapter.classList.add('visible');
+                    }
+                });
+            }
+
+            function createHandprint(e) {
+                const x = e.clientX - 50;
+                const y = e.clientY - 50;
+                handprint.style.left = x + 'px';
+                handprint.style.top = y + 'px';
+                handprint.style.opacity = '0.7';
+                
+                setTimeout(() => {
+                    handprint.style.opacity = '0';
+                }, 2000);
+            }
+
+            function showGhost() {
+                const now = Date.now();
+                if (now - lastGhostAppearance < 10000) return;
+                
+                lastGhostAppearance = now;
+                const x = Math.random() * (window.innerWidth - 80);
+                const y = Math.random() * (window.innerHeight - 120);
+                
+                ghost.style.left = x + 'px';
+                ghost.style.top = y + 'px';
+                ghost.style.opacity = '0.6';
+                
+                setTimeout(() => {
+                    ghost.style.opacity = '0';
+                }, 300);
+            }
+
+            function distortText() {
+                const chapters = document.querySelectorAll('.chapter');
+                chapters.forEach(chapter => {
+                    if (Math.random() < 0.01) {
+                        const originalText = chapter.innerHTML;
+                        chapter.innerHTML = originalText.split('').map(char => 
+                            Math.random() < 0.1 ? '血' : char
+                        ).join('');
+                        
+                        setTimeout(() => {
+                            chapter.innerHTML = originalText;
+                        }, 100);
+                    }
+                });
+            }
+
+            document.getElementById('autoScroll').addEventListener('change', function() {
+            if (this.checked) {
+                autoScrollInterval = setInterval(() => {
+                    window.scrollBy(0, 1);
+                    checkJumpscares(); // Add jumpscare check on each scroll
+                    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+                        window.scrollTo(0, 0);
+                    }
+                }, 20);
+            } else {
+                clearInterval(autoScrollInterval);
+            }
+        });
+        startButton.addEventListener('click', () => {
+            startScreen.style.opacity = '0';
+            setTimeout(() => {
+                startScreen.style.display = 'none';
+            }, 2000);
+            if (document.getElementById('soundToggle').checked) {
+                backgroundMusic.play();
+            }
+        });
+
+            soundToggle.addEventListener('change', function() {
+                soundEnabled = this.checked;
+                if (soundEnabled) {
+                    backgroundMusic.play();
+                } else {
+                    backgroundMusic.pause();
+                }
+            });
+
+            window.addEventListener('scroll', checkVisibility);
+            document.addEventListener('mousemove', createHandprint);
+            setInterval(showGhost, 3000);
+            setInterval(distortText, 100);
+            checkVisibility();
+            window.addEventListener('scroll', checkJumpscares);
+
+            function createGlitchLines() {
+                if (Math.random() < 0.1) {
+                    const line = document.createElement('div');
+                    line.className = 'glitch-line';
+                    line.style.top = Math.random() * window.innerHeight + 'px';
+                    document.body.appendChild(line);
+                    
+                    setTimeout(() => line.remove(), 3000);
+                }
+            }
+
+            function intensifyGlitch() {
+                const elements = document.querySelectorAll('.chapter, .title, .subtitle');
+                elements.forEach(el => {
+                    if (Math.random() < 0.05) {
+                        el.style.transform = `translate(${Math.random() * 10 - 5}px, ${Math.random() * 10 - 5}px)`;
+                        el.style.filter = `hue-rotate(${Math.random() * 360}deg)`;
+                        
+                        setTimeout(() => {
+                            el.style.transform = '';
+                            el.style.filter = '';
+                        }, 100);
+                    }
+                });
+            }
+
+            setInterval(createGlitchLines, 200);
+            setInterval(intensifyGlitch, 100);
+        });
+    </script>
+</body>
+</html>
